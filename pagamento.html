@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento - ILLUMINATE VINIL</title>
+    <link rel="stylesheet" href="style1.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .pagamento-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .pagamento-container h2 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .resumo-pedido {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .resumo-pedido h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .item-resumo {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item-resumo:last-child {
+            border-bottom: none;
+        }
+
+        .item-resumo .nome {
+            color: #333;
+            flex: 1;
+        }
+
+        .item-resumo .preco {
+            color: #7d0cbf;
+            font-weight: 700;
+        }
+
+        .total-resumo {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #333;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #284bad;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn-pagar {
+            width: 100%;
+            padding: 15px;
+            background-color: #284bad;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-pagar:hover {
+            background-color: #1e3a8a;
+        }
+
+        .btn-pagar:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .mensagem-sucesso {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .mensagem-sucesso.mostrar {
+            display: block;
+        }
+
+        .mensagem-sucesso h3 {
+            color: #28a745;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .mensagem-sucesso p {
+            color: #155724;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-voltar {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #284bad;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .btn-voltar:hover {
+            background-color: #1e3a8a;
+        }
+
+        .carrinho-vazio {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .carrinho-vazio a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: #284bad;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <section style="background-color: white;">
+        <div class="navbar">
+            <div class="logo">
+                <a href="index.html"><img src="FOTOS/Logo.png" alt="LOGO ILLUMINATE"></a>
+            </div>
+
+            <div class="menu">
+                <a href="index.html">VOLTAR À LOJA</a>
+            </div>
+        </div>
+        <hr>
+
+        <div class="pagamento-container">
+            <h2>Finalizar Pagamento</h2>
+
+            <div id="conteudo-pagamento">
+                <div class="resumo-pedido" id="resumo-pedido">
+                    <h3>Resumo do Pedido</h3>
+                    <div id="itens-resumo"></div>
+                    <div class="total-resumo">
+                        <span>Total:</span>
+                        <span id="total-resumo">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <form id="form-pagamento">
+                    <h3 style="color: #333; margin-bottom: 20px;">Dados de Pagamento</h3>
+
+                    <div class="form-group">
+                        <label for="nome">Nome Completo</label>
+                        <input type="text" id="nome" name="nome" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefone">Telefone</label>
+                        <input type="tel" id="telefone" name="telefone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endereco">Endereço</label>
+                        <input type="text" id="endereco" name="endereco" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cidade">Cidade</label>
+                            <input type="text" id="cidade" name="cidade" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <input type="text" id="estado" name="estado" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cep">CEP</label>
+                            <input type="text" id="cep" name="cep" required>
+                        </div>
+                    </div>
+
+                    <h3 style="color: #333; margin-top: 30px; margin-bottom: 20px;">Método de Pagamento</h3>
+
+                    <div class="form-group">
+                        <label for="metodo-pagamento">Forma de Pagamento</label>
+                        <select id="metodo-pagamento" name="metodo-pagamento" required>
+                            <option value="">Selecione...</option>
+                            <option value="cartao-credito">Cartão de Crédito</option>
+                            <option value="cartao-debito">Cartão de Débito</option>
+                            <option value="pix">PIX</option>
+                            <option value="boleto">Boleto Bancário</option>
+                        </select>
+                    </div>
+
+                    <div id="dados-cartao" style="display: none;">
+                        <div class="form-group">
+                            <label for="numero-cartao">Número do Cartão</label>
+                            <input type="text" id="numero-cartao" name="numero-cartao" placeholder="0000 0000 0000 0000" maxlength="19">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="validade">Validade</label>
+                                <input type="text" id="validade" name="validade" placeholder="MM/AA" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" name="cvv" placeholder="000" maxlength="3">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nome-cartao">Nome no Cartão</label>
+                            <input type="text" id="nome-cartao" name="nome-cartao">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-pagar" id="btn-pagar">Finalizar Pagamento</button>
+                </form>
+            </div>
+
+            <div class="mensagem-sucesso" id="mensagem-sucesso">
+                <h3>✓ Compra Realizada com Sucesso!</h3>
+                <p>Seu pedido foi processado com sucesso. Você receberá um e-mail de confirmação em breve.</p>
+                <p><strong>Obrigado por comprar na ILLUMINATE VINIL!</strong></p>
+                <a href="index.html" class="btn-voltar">Voltar à Loja</a>
+            </div>
+
+            <div class="carrinho-vazio" id="carrinho-vazio" style="display: none;">
+                <h3>Seu carrinho está vazio</h3>
+                <p>Adicione produtos ao carrinho antes de finalizar a compra.</p>
+                <a href="index.html">Voltar à Loja</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Carregar dados do carrinho do localStorage
+        let carrinho = JSON.parse(localStorage.getItem('carrinhoPagamento')) || [];
+        
+        const itensResumo = document.getElementById('itens-resumo');
+        const totalResumo = document.getElementById('total-resumo');
+        const formPagamento = document.getElementById('form-pagamento');
+        const mensagemSucesso = document.getElementById('mensagem-sucesso');
+        const conteudoPagamento = document.getElementById('conteudo-pagamento');
+        const carrinhoVazio = document.getElementById('carrinho-vazio');
+        const metodoPagamento = document.getElementById('metodo-pagamento');
+        const dadosCartao = document.getElementById('dados-cartao');
+
+        // Exibir resumo do pedido
+        function exibirResumo() {
+            if (carrinho.length === 0) {
+                conteudoPagamento.style.display = 'none';
+                carrinhoVazio.style.display = 'block';
+                return;
+            }
+
+            itensResumo.innerHTML = '';
+            let total = 0;
+
+            carrinho.forEach(item => {
+                const subtotal = item.preco * item.quantidade;
+                total += subtotal;
+
+                const itemElement = document.createElement('div');
+                itemElement.className = 'item-resumo';
+                itemElement.innerHTML = `
+                    <span class="nome">${item.nome} x ${item.quantidade}</span>
+                    <span class="preco">R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
+                `;
+                itensResumo.appendChild(itemElement);
+            });
+
+            totalResumo.innerHTML = `
+                <span>Total:</span>
+                <span>R$ ${total.toFixed(2).replace('.', ',')}</span>
+            `;
+        }
+
+        // Mostrar/ocultar campos de cartão
+        metodoPagamento.addEventListener('change', function() {
+            if (this.value === 'cartao-credito' || this.value === 'cartao-debito') {
+                dadosCartao.style.display = 'block';
+                document.getElementById('numero-cartao').required = true;
+                document.getElementById('validade').required = true;
+                document.getElementById('cvv').required = true;
+                document.getElementById('nome-cartao').required = true;
+            } else {
+                dadosCartao.style.display = 'none';
+                document.getElementById('numero-cartao').required = false;
+                document.getElementById('validade').required = false;
+                document.getElementById('cvv').required = false;
+                document.getElementById('nome-cartao').required = false;
+            }
+        });
+
+        // Máscara para número do cartão
+        document.getElementById('numero-cartao').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = value;
+        });
+
+        // Máscara para validade
+        document.getElementById('validade').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // Máscara para CEP
+        document.getElementById('cep').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 5) {
+                value = value.substring(0, 5) + '-' + value.substring(5, 8);
+            }
+            e.target.value = value;
+        });
+
+        // Máscara para telefone
+        document.getElementById('telefone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 10) {
+                value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+            } else {
+                value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            }
+            e.target.value = value;
+        });
+
+        // Processar pagamento
+        formPagamento.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Simular processamento
+            const btnPagar = document.getElementById('btn-pagar');
+            btnPagar.disabled = true;
+            btnPagar.textContent = 'Processando...';
+
+            setTimeout(() => {
+                conteudoPagamento.style.display = 'none';
+                mensagemSucesso.classList.add('mostrar');
+                
+                // Limpar carrinho do localStorage
+                localStorage.removeItem('carrinhoPagamento');
+            }, 2000);
+        });
+
+        // Inicializar
+        exibirResumo();
+    </script>
+</body>
+
+</html>
+

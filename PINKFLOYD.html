@@ -14,7 +14,7 @@
     <section style="background-color: white;">
         <div class="navbar">
             <div class="logo">
-            <a href="TERMINADO.html"><img src="FOTOS/Logo.png" alt="LOGO ILLUMINATE"></a>
+            <a href="index.html"><img src="FOTOS/Logo.png" alt="LOGO ILLUMINATE"></a>
             </div>
 
             <div class="search-box">
@@ -78,7 +78,7 @@
                         <div class="mais">+</div>
                     </div>
 
-                    <button class="buy-btn">Adicionar ao carrinho</button>
+                    <button class="buy-btn adicionar-carrinho" data-id="16" data-nome="THE DARK SIDE OF THE MOON - PINK FLOYD" data-preco="319.90" data-imagem="VINIS/PINK FLOYD.jpg">Adicionar ao carrinho</button>
 
                     <p class="aviso">Adicionar o produto no carrinho não garante a sua reserva. Finalize a compra e
                         garanta o seu produto!</p>
@@ -95,30 +95,112 @@
         </div>
 
         <script>
-            // Funcionalidade para aumentar/diminuir quantidade
-            document.querySelector('.quantity-btn.plus').addEventListener('click', function () {
-                const input = document.querySelector('.quantity-input');
+            // Sistema de Carrinho de Compras
+            let carrinho = [];
+            const abrirCarrinhoBtn = document.getElementById('abrir-carrinho');
+            const fecharCarrinhoBtn = document.getElementById('fechar-carrinho');
+            const carrinhoLateral = document.getElementById('carrinho-lateral');
+            const overlayCarrinho = document.getElementById('overlay-carrinho');
+            const itensCarrinho = document.getElementById('itens-carrinho');
+            const contadorCarrinho = document.getElementById('contador-carrinho');
+            const totalCarrinho = document.getElementById('total-carrinho');
+            const botaoAdicionar = document.querySelector('.adicionar-carrinho');
+
+            function atualizarCarrinho() {
+                itensCarrinho.innerHTML = '';
+                let total = 0;
+                let totalItens = 0;
+                carrinho.forEach(item => {
+                    total += item.preco * item.quantidade;
+                    totalItens += item.quantidade;
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'item-carrinho';
+                    itemElement.innerHTML = `<img src="${item.imagem || ''}" alt="${item.nome}" class="imagem-item-carrinho" onerror="this.style.display='none'"><div class="detalhes-item-carrinho"><div class="nome-item-carrinho">${item.nome}</div><div class="preco-item-carrinho">R$ ${item.preco.toFixed(2).replace('.', ',')} x ${item.quantidade}</div><button class="remover-item" data-id="${item.id}" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-top: 5px; font-size: 12px;">Remover</button></div>`;
+                    itensCarrinho.appendChild(itemElement);
+                });
+                totalCarrinho.textContent = total.toFixed(2).replace('.', ',');
+                contadorCarrinho.textContent = totalItens;
+                document.querySelectorAll('.remover-item').forEach(botao => {
+                    botao.addEventListener('click', function() {
+                        carrinho = carrinho.filter(item => item.id !== this.getAttribute('data-id'));
+                        atualizarCarrinho();
+                    });
+                });
+                if (carrinho.length === 0) {
+                    itensCarrinho.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Seu carrinho está vazio</p>';
+                }
+            }
+            abrirCarrinhoBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                carrinhoLateral.classList.add('aberto');
+                overlayCarrinho.classList.add('mostrar');
+            });
+            fecharCarrinhoBtn.addEventListener('click', function () {
+                carrinhoLateral.classList.remove('aberto');
+                overlayCarrinho.classList.remove('mostrar');
+            });
+            overlayCarrinho.addEventListener('click', function () {
+                carrinhoLateral.classList.remove('aberto');
+                overlayCarrinho.classList.remove('mostrar');
+            });
+            if (botaoAdicionar) {
+                botaoAdicionar.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+                    const nome = this.getAttribute('data-nome');
+                    const preco = parseFloat(this.getAttribute('data-preco'));
+                    const imagem = this.getAttribute('data-imagem');
+                    const quantidade = parseInt(document.querySelector('.quantidade-input').value) || 1;
+                    const produtoExistente = carrinho.find(item => item.id === id);
+                    if (produtoExistente) {
+                        produtoExistente.quantidade += quantidade;
+                    } else {
+                        carrinho.push({id: id, nome: nome, preco: preco, imagem: imagem, quantidade: quantidade});
+                    }
+                    atualizarCarrinho();
+                    const textoOriginal = this.textContent;
+                    this.textContent = 'Adicionado!';
+                    this.disabled = true;
+                    setTimeout(() => {
+                        this.textContent = textoOriginal;
+                        this.disabled = false;
+                    }, 1500);
+                });
+            }
+            document.querySelector('.mais').addEventListener('click', function () {
+                const input = document.querySelector('.quantidade-input');
                 input.value = parseInt(input.value) + 1;
             });
-
-            document.querySelector('.quantity-btn.minus').addEventListener('click', function () {
-                const input = document.querySelector('.quantity-input');
+            document.querySelector('.menos').addEventListener('click', function () {
+                const input = document.querySelector('.quantidade-input');
                 if (parseInt(input.value) > 1) {
                     input.value = parseInt(input.value) - 1;
                 }
             });
-
-            // Validação básica do CEP
-            document.querySelector('.shipping-input button').addEventListener('click', function () {
-                const cepInput = document.querySelector('.shipping-input input');
+            document.querySelector('.frete-input button').addEventListener('click', function () {
+                const cepInput = document.querySelector('.frete-input input');
                 const cep = cepInput.value.replace(/\D/g, '');
-
                 if (cep.length === 8) {
                     alert('Frete calculado para o CEP: ' + cep);
                 } else {
                     alert('Por favor, insira um CEP válido (8 dígitos)');
                 }
             });
+
+            // Botão Finalizar Compra
+            document.querySelector('.btn-comprar').addEventListener('click', function() {
+                if (carrinho.length === 0) {
+                    alert('Seu carrinho está vazio. Adicione produtos antes de finalizar a compra.');
+                    return;
+                }
+                
+                // Salvar carrinho no localStorage
+                localStorage.setItem('carrinhoPagamento', JSON.stringify(carrinho));
+                
+                // Redirecionar para página de pagamento
+                window.location.href = 'pagamento.html';
+            });
+
+            atualizarCarrinho();
         </script>
 </body>
 

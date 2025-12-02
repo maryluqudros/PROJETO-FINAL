@@ -1,9 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     color: white;
     font-family: "Ubuntu", sans-serif;
-    ;
+    padding-top: 100px;
 }
 
 /* ======== NAVBAR ======== */
@@ -15,6 +19,12 @@ body {
     background: white;
     flex-wrap: wrap;
     gap: 15px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .logo img {
@@ -142,6 +152,106 @@ hr {
             font-size: 1.2rem;
             margin-top: 20px;
             text-align: right;
+            color: #333;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #333;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: 300;
+        }
+
+        .btn-close:hover {
+            color: #000;
+            opacity: 0.8;
+        }
+
+        .btn-comprar {
+            background-color: #284bad;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-comprar:hover {
+            background-color: #1e3a8a;
+        }
+
+        .carrinho-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .carrinho-icon {
+            position: relative;
+            font-size: 1.5rem;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-content-between {
+            justify-content: space-between;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .mt-3 {
+            margin-top: 1rem;
+        }
+
+        .carrinho-lateral h4 {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .carrinho-lateral .nome-item-carrinho {
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .carrinho-lateral .detalhes-item-carrinho {
+            color: #333;
         }
  
 /* ======== CARROSSEL ======== */
